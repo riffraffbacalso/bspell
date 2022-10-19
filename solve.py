@@ -1,7 +1,7 @@
 import re
 import nltk
 
-nltk.download("words")
+nltk.download("words", quiet=True)
 
 from nltk.corpus import words
 
