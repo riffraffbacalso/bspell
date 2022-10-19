@@ -1,14 +1,10 @@
-import re
-import nltk
+from scrape import get_letters
+from solve import solve_bee
 
-nltk.download("words")
 
-from nltk.corpus import words
+def main() -> None:
+    print(solve_bee(get_letters()))
+
 
 if __name__ == "__main__":
-    answers = [
-        word
-        for word in words.words()
-        if bool(re.match(r"[mntyiac]+\Z", word)) and len(word) >= 4 and "m" in word
-    ]
-    print(answers)
+    main()
