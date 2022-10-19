@@ -1,12 +1,12 @@
 import textwrap as tw
 from scrape import get_letters
 from solve import solve_bee
-from word_freq import sort_words
+from word_freq import sort_by_freq
 
 
 def main() -> None:
     words = solve_bee(get_letters())
-    words = sort_words(words)
+    words = sort_by_freq(words)
     words = tw.wrap(text=" ".join(words))
     print(*words, sep="\n")
 

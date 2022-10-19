@@ -2,7 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 import httpx
 
 
-def get_ranks(words: list[str]) -> dict[str, float]:
+def get_freqs(words: list[str]) -> dict[str, float]:
     url = "https://api.datamuse.com/words"
     with httpx.Client(http2=True) as client:
 
@@ -13,16 +13,16 @@ def get_ranks(words: list[str]) -> dict[str, float]:
             return float(res.json()[0]["tags"][0][2:])
 
         with ThreadPoolExecutor(max_workers=50) as pool:
-            ranks = [extract(res) for res in pool.map(request, words)]
+            freqs = [extract(res) for res in pool.map(request, words)]
 
-    return dict(zip(words, ranks))
+    return dict(zip(words, freqs))
 
 
-def sort_words(words) -> list[str]:
-    ranks = get_ranks(words)
-    return sorted(words, key=lambda x: ranks[x], reverse=True)
+def sort_by_freq(words) -> list[str]:
+    freqs = get_freqs(words)
+    return sorted(words, key=lambda x: freqs[x], reverse=True)
 
 
 if __name__ == "__main__":
     words = ["career", "the", "avaricious"]
-    print(sort_words(words))
+    print(sort_by_freq(words))
