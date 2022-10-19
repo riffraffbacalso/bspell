@@ -4,6 +4,7 @@ import httpx
 
 def get_freqs(words: list[str]) -> dict[str, float]:
     url = "https://api.datamuse.com/words"
+    
     with httpx.Client(http2=True) as client:
 
         def request(word: str) -> httpx.Response:
