@@ -15,8 +15,8 @@ def get_letters() -> str:
     )
     driver.get(URL)
     els = driver.find_elements(By.CLASS_NAME, CLASS_NAME)
-    let_list = [str(el.get_property("textContent")) for el in els]
-    return "".join(let_list)
+    letter_list = [str(el.get_property("textContent")) for el in els]
+    return "".join(letter_list)
 
 
 if __name__ == "__main__":
