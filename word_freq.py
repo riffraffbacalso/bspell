@@ -10,11 +10,14 @@ def get_freqs(words: list[str]) -> dict[str, float]:
         def request(word: str) -> httpx.Response:
             return client.get(f"{URL}?sp={word}&md=f&max=1")
 
-        def extract(res: httpx.Response) -> float:
-            return float(res.json()[0]["tags"][0][2:])
+        def extract(res: httpx.Response, word: str) -> float:
+            obj = res.json()[0]
+            return float(obj["tags"][0][2:]) if obj["word"] == word else 0
 
         with ThreadPoolExecutor(max_workers=50) as pool:
-            freqs = [extract(res) for res in pool.map(request, words)]
+            freqs = [
+                extract(res, word) for res, word in zip(pool.map(request, words), words)
+            ]
 
     return dict(zip(words, freqs))
 
