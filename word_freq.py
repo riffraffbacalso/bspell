@@ -1,14 +1,14 @@
 from concurrent.futures import ThreadPoolExecutor
 import httpx
 
+URL = "https://api.datamuse.com/words"
+
 
 def get_freqs(words: list[str]) -> dict[str, float]:
-    url = "https://api.datamuse.com/words"
-    
     with httpx.Client(http2=True) as client:
 
         def request(word: str) -> httpx.Response:
-            return client.get(f"{url}?sp={word}&md=f&max=1")
+            return client.get(f"{URL}?sp={word}&md=f&max=1")
 
         def extract(res: httpx.Response) -> float:
             return float(res.json()[0]["tags"][0][2:])

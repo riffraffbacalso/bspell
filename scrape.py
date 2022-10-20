@@ -3,18 +3,18 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
+URL = "https://www.nytimes.com/puzzles/spelling-bee"
+CLASS_NAME = "cell-letter"
+
 
 def get_letters() -> str:
-    url = "https://www.nytimes.com/puzzles/spelling-bee"
-    class_name = "cell-letter"
-
     ops = webdriver.ChromeOptions()
     ops.add_argument("headless")
     driver = webdriver.Chrome(
         service=Service(ChromeDriverManager().install()), options=ops
     )
-    driver.get(url)
-    els = driver.find_elements(By.CLASS_NAME, class_name)
+    driver.get(URL)
+    els = driver.find_elements(By.CLASS_NAME, CLASS_NAME)
     let_list = [str(el.get_property("textContent")) for el in els]
     return "".join(let_list)
 
