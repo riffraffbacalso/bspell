@@ -4,7 +4,10 @@ version = "0.1.0"
 description = ""
 authors = ["riffraffbacalso <rbacalso1024@gmail.com>"]
 
-packages = [{ include = "*.py", from = "spelling_bee" }]
+packages = [
+    { include = "spelling_bee" },
+    { include = "*.py", from = "spelling_bee" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
