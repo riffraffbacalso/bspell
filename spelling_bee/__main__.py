@@ -7,7 +7,7 @@ from word_freq import sort_by_freq
 def main() -> None:
     words = solve_bee(get_letters())
     words = sort_by_freq(words)
-    words = fprint(words)
+    fprint(words)
 
 
 if __name__ == "__main__":
