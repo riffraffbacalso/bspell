@@ -5,7 +5,7 @@ RST = "\033[0m"
 
 
 def wrap(words: list[str]) -> list[str]:
-    return tw.wrap(text=" ".join(words))
+    return tw.wrap(" ".join(words))
 
 
 def highlight_lines(lines: list[str]) -> list[str]:
