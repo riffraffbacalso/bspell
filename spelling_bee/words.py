@@ -17,11 +17,11 @@ MISSING_WORDS = ["near", "behaviour", "harbour", "humour", "box", "colour"]
 def request_OPTED_words() -> None:
     with httpx.Client(http2=True) as client:
 
-        def write_out(gen: Iterator[str], letter: str) -> None:
+        def write_out(line_gen: Iterator[str], letter: str) -> None:
             with open(f"{PATH}/{letter}.words", "w") as f:
                 word_gen = (
                     match.group().lower()
-                    for line in gen
+                    for line in line_gen
                     if (match := re.search(REGEX, line))
                 )
                 print(
