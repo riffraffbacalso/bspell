@@ -1,8 +1,8 @@
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import ExitStack
-import re
 from string import ascii_lowercase
 from typing import Iterator
+import re
 import httpx
 import nltk
 
