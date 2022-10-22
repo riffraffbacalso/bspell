@@ -18,8 +18,8 @@ def get_args() -> Namespace:
 
 
 def main() -> None:
-    word_src = get_args().word_src
-    words = solve_bee(get_letters(), word_src)
+    args = get_args()
+    words = solve_bee(get_letters(), args.word_src)
     words = sort_by_freq(words)
     fprint(words)
 
