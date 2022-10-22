@@ -65,7 +65,7 @@ def get_words(word_src: str) -> list[str]:
     elif word_src == "NLTK":
         word_list = read_NLTK_words()
     else:
-        raise ValueError(f"invalid word_src: '{word_src}'")
+        raise ValueError(f"invalid word source: '{word_src}'")
     return word_list
 
 
