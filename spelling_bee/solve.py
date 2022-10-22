@@ -8,7 +8,7 @@ import nltk
 
 
 MISSING_WORDS = ["near", "behaviour", "harbour", "humour", "box", "colour"]
-PATH = "/Users/rafaelbacalso/Dev/spelling-bee/spelling_bee/words"
+PATH = "spelling_bee/words"
 URL = "https://www.mso.anu.edu.au/~ralph/OPTED/v003/wb1913_"
 REGEX = r"(?<=<B>)[A-Z][a-zA-Z]*(?=</B>)"
 
@@ -72,4 +72,4 @@ def solve_bee(letters: str, *, word_src: str = "OPTED") -> list[str]:
 
 
 if __name__ == "__main__":
-    print(solve_bee("problem"))
+    print(solve_bee("clmyiao"))
