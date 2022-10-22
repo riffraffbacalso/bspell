@@ -10,7 +10,7 @@ import nltk
 MISSING_WORDS = ["near", "behaviour", "harbour", "humour", "box", "colour"]
 PATH = "/Users/rafaelbacalso/Dev/spelling-bee/spelling_bee/words"
 URL = "https://www.mso.anu.edu.au/~ralph/OPTED/v003/wb1913_"
-REGEX = r"(?<=<B>)[a-zA-Z]+(?=</B>)"
+REGEX = r"(?<=<B>)[A-Z][a-zA-Z]*(?=</B>)"
 
 
 def request_words() -> None:
