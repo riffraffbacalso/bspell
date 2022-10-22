@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import ExitStack
 from string import ascii_lowercase
 from typing import Iterator
+import os
 import re
 import httpx
 import nltk
@@ -43,6 +44,11 @@ def request_OPTED_words() -> None:
 
 def read_OPTED_words() -> list[str]:
     words = []
+    if not os.path.exists(PATH):
+        os.mkdir(PATH)
+    if not set(os.listdir(PATH)) >= {f"{letter}.words" for letter in ascii_lowercase}:
+        print("  retrieving OPTED words...")
+        request_OPTED_words()
     with ExitStack() as stack:
         files = [
             stack.enter_context(open(f"{PATH}/{letter}.words"))
