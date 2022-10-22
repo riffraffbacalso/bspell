@@ -3,10 +3,9 @@ from words import get_words
 
 
 def solve_bee(letters: str, word_src: str) -> list[str]:
-    words = get_words(word_src)
     return [
         word
-        for word in words
+        for word in get_words(word_src)
         if bool(re.match(rf"[{letters}]+\Z", word))
         and len(word) >= 4
         and letters[0] in word
