@@ -10,7 +10,7 @@ import nltk
 
 PATH = "spelling_bee/words"
 URL = "https://www.mso.anu.edu.au/~ralph/OPTED/v003/wb1913_"
-REGEX = r"(?<=<B>)[A-Z][a-zA-Z]*(?=</B>)"
+REGEX = r"(?<=<B>)[A-Z][a-zA-Z]{3,}(?=</B>)"
 MISSING_WORDS = ["near", "behaviour", "harbour", "humour", "box", "colour"]
 
 
@@ -20,10 +20,9 @@ def request_OPTED_words() -> None:
         def write_out(gen: Iterator[str], letter: str) -> None:
             with open(f"{PATH}/{letter}.words", "w") as f:
                 word_gen = (
-                    word.lower()
+                    match.group().lower()
                     for line in gen
                     if (match := re.search(REGEX, line))
-                    and len(word := match.group()) >= 4
                 )
                 print(
                     *list(dict.fromkeys(word_gen)),
