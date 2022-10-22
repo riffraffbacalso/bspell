@@ -54,8 +54,7 @@ def read_OPTED_words() -> list[str]:
 
 def read_NLTK_words():
     nltk.download("words", quiet=True)
-    from nltk.corpus import words
-
+    from nltk.corpus import words  # fmt:skip
     return words.words("en") + MISSING_WORDS
 
 
