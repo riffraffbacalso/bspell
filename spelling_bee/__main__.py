@@ -12,7 +12,7 @@ def get_args() -> Namespace:
         "--word-src",
         default="OPTED",
         metavar="<word source>",
-        help="The source of words used for puzzle solutions",
+        help="the source of words used for puzzle solutions",
     )
     return parser.parse_args()
 
