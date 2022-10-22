@@ -52,7 +52,7 @@ def read_words() -> list[str]:
     return words
 
 
-def solve_bee(letters: str, *, word_src: str = "OPTED") -> list[str]:
+def solve_bee(letters: str, word_src: str) -> list[str]:
     if word_src == "OPTED":
         word_list = read_words()
     elif word_src == "NLTK":
@@ -72,4 +72,4 @@ def solve_bee(letters: str, *, word_src: str = "OPTED") -> list[str]:
 
 
 if __name__ == "__main__":
-    print(solve_bee("clmyiao"))
+    print(solve_bee("problem", "OPTED"))
