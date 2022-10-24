@@ -6,7 +6,7 @@ def solve_bee(letters: str, word_src: str) -> list[str]:
     return [
         word
         for word in get_words(word_src)
-        if re.match(rf"[{letters}]+\Z", word) and letters[0] in word
+        if re.match(rf"[{letters}]{{4,}}\Z", word) and letters[0] in word
     ]
 
 
