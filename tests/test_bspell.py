@@ -1,4 +1,4 @@
-from spelling_bee import __version__
+from bspell import __version__
 
 
 def test_version():

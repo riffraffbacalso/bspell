@@ -8,7 +8,7 @@ import httpx
 import nltk
 
 
-PATH = "spelling_bee/words"
+PATH = "bspell/words"
 URL = "https://www.mso.anu.edu.au/~ralph/OPTED/v003/wb1913_"
 REGEX = r"(?<=<B>)[A-Z][a-zA-Z]{3,}(?=</B>)"
 MISSING_WORDS = ["near", "behaviour", "harbour", "humour", "box", "colour"]
