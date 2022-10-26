@@ -32,7 +32,7 @@ def request_OPTED_words() -> None:
                 print(
                     *list(dict.fromkeys(word_gen)),
                     file=f,
-                    sep=",",
+                    sep="\n",
                 )
 
         def request_write(letter: str) -> None:
@@ -60,7 +60,7 @@ def read_OPTED_words() -> list[str]:
             stack.enter_context(open(f"{OPTED_PATH}/{letter}.words"))
             for letter in ascii_lowercase
         ]
-        words = sum([f.strip("\n").split(",") for f in next(zip(*files))], [])
+        words = sum([f.read().strip("\n").split("\n") for f in files], [])
     return words
 
 
