@@ -5,17 +5,15 @@ from typing import Iterator
 import os
 import re
 import httpx
-import nltk
 
 OS_DICT_PATH = "/usr/share/dict/words"
 OPTED_PATH = "bspell/words"
 URL = "https://www.mso.anu.edu.au/~ralph/OPTED/v003/wb1913_"
 REGEX = r"(?<=<B>)[A-Z][a-zA-Z]{3,}(?=</B>)"
-MISSING_WORDS = ["near", "behaviour", "harbour", "humour", "box", "colour"]
 
 
 def read_OS_words() -> list[str]:
-    with open("/usr/share/dict/words") as f:
+    with open(OS_DICT_PATH) as f:
         return [word for word in f.read().split("\n") if len(word) >= 4]
 
 
@@ -64,19 +62,11 @@ def read_OPTED_words() -> list[str]:
     return words
 
 
-def read_NLTK_words():
-    nltk.download("words", quiet=True)
-    from nltk.corpus import words  # fmt:skip
-    return words.words("en") + MISSING_WORDS
-
-
 def get_words(word_src: str) -> list[str]:
     if word_src == "OS":
         word_list = read_OS_words()
     elif word_src == "OPTED":
         word_list = read_OPTED_words()
-    elif word_src == "NLTK":
-        word_list = read_NLTK_words()
     else:
         raise ValueError(f"invalid word source: '{word_src}'")
     return word_list

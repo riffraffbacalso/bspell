@@ -11,4 +11,4 @@ def solve_bee(letters: str, word_src: str) -> list[str]:
 
 
 if __name__ == "__main__":
-    print(solve_bee("problem", "OPTED"))
+    print(solve_bee("problem", "OS"))
