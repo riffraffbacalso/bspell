@@ -1,5 +1,4 @@
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import ExitStack
 from itertools import islice
 from string import ascii_lowercase
 from typing import Iterator
@@ -24,25 +23,26 @@ def read_OS_words() -> list[str]:
 def request_OPTED_words() -> list[str]:
     with httpx.Client(http2=True) as client:
 
-        def write_out(line_gen: Iterator[str], letter: str) -> list[str]:
-            with open(f"{ALT_PATH}/{letter}.words", "w") as f:
-                word_dict = dict.fromkeys(
-                    match.group().lower()
-                    for line in line_gen
-                    if (match := re.search(OPTED_REGEX, line))
-                )
-                print(*word_dict, file=f, sep="\n")
-                return list(word_dict)
+        def extract_list(line_gen: Iterator[str], letter: str) -> list[str]:
+            word_gen = (
+                match.group().lower()
+                for line in line_gen
+                if (match := re.search(OPTED_REGEX, line))
+            )
+            return list(dict.fromkeys(word_gen))
 
-        def request_write(letter: str) -> list[str]:
+        def request_for_letter(letter: str) -> list[str]:
             with client.stream("GET", f"{OPTED_URL}{letter}.html") as res:
                 line_gen = res.iter_lines()
                 while next(line_gen) != "<BODY>\n":
                     pass
-                return write_out(line_gen, letter)
+                return extract_list(line_gen, letter)
 
         with ThreadPoolExecutor(max_workers=26) as pool:
-            return sum(pool.map(request_write, ascii_lowercase), [])
+            word_list = sum(pool.map(request_for_letter, ascii_lowercase), [])
+        with open(f"{ALT_PATH}/OPTED.words", "w") as f:
+            print(*word_list, file=f, sep="\n")
+        return word_list
 
 
 def read_OPTED_words() -> list[str]:
@@ -55,12 +55,8 @@ def read_OPTED_words() -> list[str]:
         print("  retrieving OPTED words...")
         words = request_OPTED_words()
     else:
-        with ExitStack() as stack:
-            files = [
-                stack.enter_context(open(f"{ALT_PATH}/{letter}.words"))
-                for letter in ascii_lowercase
-            ]
-            words = sum([f.read().strip("\n").split("\n") for f in files], [])
+        with open(f"{ALT_PATH}/OPTED.words") as f:
+            words = f.read().strip("\n").split("\n")
     return words
 
 
@@ -102,14 +98,14 @@ def read_chirico_words() -> list[str]:
 
 def get_words(word_src: str) -> list[str]:
     if word_src == "OS":
-        word_dict = read_OS_words()
+        word_list = read_OS_words()
     elif word_src == "OPTED":
-        word_dict = read_OPTED_words()
+        word_list = read_OPTED_words()
     elif word_src == "chirico":
-        word_dict = read_chirico_words()
+        word_list = read_chirico_words()
     else:
         raise ValueError(f"invalid word source: '{word_src}'")
-    return word_dict
+    return word_list
 
 
 if __name__ == "__main__":
