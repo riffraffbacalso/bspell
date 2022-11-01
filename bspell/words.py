@@ -18,7 +18,7 @@ CHIRICO_REGEX = r"[^']{4,}\Z"
 
 def read_OS_words() -> list[str]:
     with open(OS_DICT_PATH) as f:
-        return [word for word in f.read().split("\n") if len(word) >= 4]
+        return [word.lower() for word in f.read().split("\n") if len(word) >= 4]
 
 
 def request_OPTED_words() -> None:
