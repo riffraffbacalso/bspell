@@ -49,9 +49,7 @@ def read_OPTED_words() -> list[str]:
     words = []
     if not os.path.exists(ALT_PATH):
         os.mkdir(ALT_PATH)
-    if not set(os.listdir(ALT_PATH)) >= {
-        f"{letter}.words" for letter in ascii_lowercase
-    }:
+    if "OPTED.words" not in os.listdir(ALT_PATH):
         print("  retrieving OPTED words...")
         words = request_OPTED_words()
     else:
