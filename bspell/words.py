@@ -32,7 +32,7 @@ def request_OPTED_words() -> None:
                     if (match := re.search(OPTED_REGEX, line))
                 )
                 print(
-                    *list(dict.fromkeys(word_gen)),
+                    *dict.fromkeys(word_gen),
                     file=f,
                     sep="\n",
                 )
