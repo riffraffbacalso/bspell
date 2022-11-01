@@ -7,8 +7,8 @@ import os
 import re
 import httpx
 
-OS_DICT_PATH = "/usr/share/dict/words"
-ALT_PATH = "bspell/words"
+OS_WORDS_PATH = "/usr/share/dict/words"
+ALT_WORDS_PATH = "bspell/words"
 OPTED_URL = "https://www.mso.anu.edu.au/~ralph/OPTED/v003/wb1913_"
 CHIRICO_URL = "https://sourceforge.net/projects/souptonuts/files/souptonuts/dictionary/linuxwords.1.tar.gz/download"
 OPTED_REGEX = r"(?<=<B>)[A-Z][a-zA-Z]{3,}(?=</B>)"
@@ -16,7 +16,7 @@ CHIRICO_REGEX = r"[^']{4,}\Z"
 
 
 def read_OS_words() -> list[str]:
-    with open(OS_DICT_PATH) as f:
+    with open(OS_WORDS_PATH) as f:
         return [word.lower() for word in f.read().split("\n") if len(word) >= 4]
 
 
@@ -40,20 +40,20 @@ def request_OPTED_words() -> list[str]:
 
         with ThreadPoolExecutor(max_workers=26) as pool:
             word_list = sum(pool.map(request_for_letter, ascii_lowercase), [])
-        with open(f"{ALT_PATH}/OPTED.words", "w") as f:
+        with open(f"{ALT_WORDS_PATH}/OPTED.words", "w") as f:
             print(*word_list, file=f, sep="\n")
         return word_list
 
 
 def read_OPTED_words() -> list[str]:
     words = []
-    if not os.path.exists(ALT_PATH):
-        os.mkdir(ALT_PATH)
-    if "OPTED.words" not in os.listdir(ALT_PATH):
+    if not os.path.exists(ALT_WORDS_PATH):
+        os.mkdir(ALT_WORDS_PATH)
+    if "OPTED.words" not in os.listdir(ALT_WORDS_PATH):
         print("  retrieving OPTED words...")
         words = request_OPTED_words()
     else:
-        with open(f"{ALT_PATH}/OPTED.words") as f:
+        with open(f"{ALT_WORDS_PATH}/OPTED.words") as f:
             words = f.read().strip("\n").split("\n")
     return words
 
@@ -73,19 +73,19 @@ def request_chirico_words() -> None:
     while (byte := next(byte_gen)) == b"\x00":
         pass
     next(byte_gen)
-    with open(f"{ALT_PATH}/chirico.words", "wb") as f:
+    with open(f"{ALT_WORDS_PATH}/chirico.words", "wb") as f:
         while (byte := next(byte_gen)) != b"\x00":
             f.write(byte)
 
 
 def read_chirico_words() -> list[str]:
     words = []
-    if not os.path.exists(ALT_PATH):
-        os.mkdir(ALT_PATH)
-    if "chirico.words" not in os.listdir(ALT_PATH):
+    if not os.path.exists(ALT_WORDS_PATH):
+        os.mkdir(ALT_WORDS_PATH)
+    if "chirico.words" not in os.listdir(ALT_WORDS_PATH):
         print("  retrieving chirico words...")
         request_chirico_words()
-    with open(f"{ALT_PATH}/chirico.words", "rb") as f:
+    with open(f"{ALT_WORDS_PATH}/chirico.words", "rb") as f:
         words = [
             word.lower()
             for b_word in f.read().strip(b"\n").split(b"\n")
