@@ -40,9 +40,11 @@ def request_OPTED_words() -> list[str]:
 
         with ThreadPoolExecutor(max_workers=26) as pool:
             word_list = sum(pool.map(request_for_letter, ascii_lowercase), [])
-        with open(f"{ALT_WORDS_PATH}/OPTED.words", "w") as f:
-            print(*word_list, file=f, sep="\n")
-        return word_list
+
+    with open(f"{ALT_WORDS_PATH}/OPTED.words", "w") as f:
+        print(*word_list, file=f, sep="\n")
+    
+    return word_list
 
 
 def read_OPTED_words() -> list[str]:
