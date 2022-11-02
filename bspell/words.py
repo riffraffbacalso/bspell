@@ -23,7 +23,7 @@ def read_OS_words() -> list[str]:
 def request_OPTED_words() -> list[str]:
     with httpx.Client(http2=True) as client:
 
-        def extract_list(line_gen: Iterator[str], letter: str) -> list[str]:
+        def extract_list(line_gen: Iterator[str]) -> list[str]:
             word_gen = (
                 match.group().lower()
                 for line in line_gen
@@ -36,7 +36,7 @@ def request_OPTED_words() -> list[str]:
                 line_gen = res.iter_lines()
                 while next(line_gen) != "<BODY>\n":
                     pass
-                return extract_list(line_gen, letter)
+                return extract_list(line_gen)
 
         with ThreadPoolExecutor(max_workers=26) as pool:
             word_list = sum(pool.map(request_for_letter, ascii_lowercase), [])
