@@ -43,7 +43,7 @@ def request_OPTED_words() -> list[str]:
 
     with open(f"{ALT_WORDS_PATH}/OPTED.words", "w") as f:
         print(*words, file=f, sep="\n")
-    
+
     return words
 
 
@@ -64,13 +64,13 @@ def request_chirico_words() -> list[str]:
     byte_gen = (char.to_bytes(1, "big") for char in data)
     count = 0
     while count < 7:
-        while (byte := next(byte_gen)) != b"c":
+        while next(byte_gen) != b"c":
             pass
         if list(islice(byte_gen, 6)) == [b"h", b"i", b"r", b"i", b"c", b"o"]:
             count += 1
             for _ in range(6):
                 next(byte_gen)
-    while (byte := next(byte_gen)) == b"\x00":
+    while next(byte_gen) == b"\x00":
         pass
     next(byte_gen)
     words = "".join(
