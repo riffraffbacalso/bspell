@@ -39,25 +39,23 @@ def request_OPTED_words() -> list[str]:
                 return extract_list(line_gen)
 
         with ThreadPoolExecutor(max_workers=26) as pool:
-            word_list = sum(pool.map(request_for_letter, ascii_lowercase), [])
+            words = sum(pool.map(request_for_letter, ascii_lowercase), [])
 
     with open(f"{ALT_WORDS_PATH}/OPTED.words", "w") as f:
-        print(*word_list, file=f, sep="\n")
+        print(*words, file=f, sep="\n")
     
-    return word_list
+    return words
 
 
 def read_OPTED_words() -> list[str]:
-    words = []
     if not os.path.exists(ALT_WORDS_PATH):
         os.mkdir(ALT_WORDS_PATH)
     if "OPTED.words" not in os.listdir(ALT_WORDS_PATH):
         print("  retrieving OPTED words...")
-        words = request_OPTED_words()
+        return request_OPTED_words()
     else:
         with open(f"{ALT_WORDS_PATH}/OPTED.words") as f:
-            words = f.read().strip("\n").split("\n")
-    return words
+            return f.read().strip("\n").split("\n")
 
 
 def request_chirico_words() -> list[str]:
@@ -85,28 +83,25 @@ def request_chirico_words() -> list[str]:
 
 
 def read_chirico_words() -> list[str]:
-    words = []
     if not os.path.exists(ALT_WORDS_PATH):
         os.mkdir(ALT_WORDS_PATH)
     if "chirico.words" not in os.listdir(ALT_WORDS_PATH):
         print("  retrieving chirico words...")
-        words = request_chirico_words()
+        return request_chirico_words()
     else:
         with open(f"{ALT_WORDS_PATH}/chirico.words") as f:
-            words = [word for word in f.read().strip("\n").split("\n")]
-    return words
+            return [word for word in f.read().strip("\n").split("\n")]
 
 
 def get_words(word_src: str) -> list[str]:
     if word_src == "OS":
-        word_list = read_OS_words()
+        return read_OS_words()
     elif word_src == "OPTED":
-        word_list = read_OPTED_words()
+        return read_OPTED_words()
     elif word_src == "chirico":
-        word_list = read_chirico_words()
+        return read_chirico_words()
     else:
         raise ValueError(f"invalid word source: '{word_src}'")
-    return word_list
 
 
 if __name__ == "__main__":
