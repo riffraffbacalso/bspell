@@ -60,7 +60,7 @@ def read_OPTED_words() -> list[str]:
     return words
 
 
-def request_chirico_words() -> None:
+def request_chirico_words() -> list[str]:
     res = httpx.get(CHIRICO_URL, follow_redirects=True)
     data = gzip.decompress(res.content)
     byte_gen = (char.to_bytes(1, "big") for char in data)
@@ -75,9 +75,13 @@ def request_chirico_words() -> None:
     while (byte := next(byte_gen)) == b"\x00":
         pass
     next(byte_gen)
-    with open(f"{ALT_WORDS_PATH}/chirico.words", "wb") as f:
-        while (byte := next(byte_gen)) != b"\x00":
-            f.write(byte)
+    words = "".join(
+        str(byte).lower()[2:-1] for byte in byte_gen if byte != b"\x00"
+    ).split(r"\n")
+    words = [word for word in dict.fromkeys(words) if re.match(CHIRICO_REGEX, word)]
+    with open(f"{ALT_WORDS_PATH}/chirico.words", "w") as f:
+        print(*words, file=f, sep="\n")
+    return words
 
 
 def read_chirico_words() -> list[str]:
@@ -86,13 +90,10 @@ def read_chirico_words() -> list[str]:
         os.mkdir(ALT_WORDS_PATH)
     if "chirico.words" not in os.listdir(ALT_WORDS_PATH):
         print("  retrieving chirico words...")
-        request_chirico_words()
-    with open(f"{ALT_WORDS_PATH}/chirico.words", "rb") as f:
-        words = [
-            word.lower()
-            for b_word in f.read().strip(b"\n").split(b"\n")
-            if re.match(CHIRICO_REGEX, (word := str(b_word)[2:-1]))
-        ]
+        words = request_chirico_words()
+    else:
+        with open(f"{ALT_WORDS_PATH}/chirico.words") as f:
+            words = [word for word in f.read().strip("\n").split("\n")]
     return words
 
 
