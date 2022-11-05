@@ -15,6 +15,7 @@ black = "^22.6.0"
 webdriver-manager = { git = "https://github.com/SergeyPirogov/webdriver_manager", rev = "master" }
 selenium = "^4.5.0"
 httpx = { extras = ["http2"], version = "^0.23.0" }
+retry = "^0.9.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
+from retry_msg import retry_msg
 import httpx
 
 URL = "https://api.datamuse.com/words"
@@ -7,6 +8,7 @@ URL = "https://api.datamuse.com/words"
 def get_freqs(words: list[str]) -> dict[str, float]:
     with httpx.Client(http2=True) as client:
 
+        @retry_msg("persistent network error when retrieving word frequencies")
         def request(word: str) -> httpx.Response:
             return client.get(f"{URL}?sp={word}&md=f&max=1")
 

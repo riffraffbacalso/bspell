@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 from itertools import islice
 from string import ascii_lowercase
 from typing import Iterator
+from retry_msg import retry_msg
 import gzip
 import os
 import re
@@ -31,6 +32,7 @@ def request_OPTED_words() -> list[str]:
             )
             return list(dict.fromkeys(word_gen))
 
+        @retry_msg("persistent network error when retrieving OPTED words")
         def request_for_letter(letter: str) -> list[str]:
             with client.stream("GET", f"{OPTED_URL}{letter}.html") as res:
                 line_gen = res.iter_lines()
@@ -59,9 +61,15 @@ def read_OPTED_words() -> list[str]:
 
 
 def request_chirico_words() -> list[str]:
-    res = httpx.get(CHIRICO_URL, follow_redirects=True)
+    @retry_msg("persistent network error when retrieving chirico words")
+    def request_redirect() -> httpx.Response:
+        return httpx.get(CHIRICO_URL, follow_redirects=True)
+
+    res = request_redirect()
     data = gzip.decompress(res.content)
     byte_gen = (char.to_bytes(1, "big") for char in data)
+
+    # TODO: isolate content as file instead of arbitrary byte stream position
     count = 0
     while count < 7:
         while next(byte_gen) != b"c":
@@ -73,12 +81,15 @@ def request_chirico_words() -> list[str]:
     while next(byte_gen) == b"\x00":
         pass
     next(byte_gen)
+
     words = "".join(
         str(byte).lower()[2:-1] for byte in byte_gen if byte != b"\x00"
     ).split(r"\n")
     words = [word for word in dict.fromkeys(words) if re.match(CHIRICO_REGEX, word)]
+
     with open(f"{ALT_WORDS_PATH}/chirico.words", "w") as f:
         print(*words, file=f, sep="\n")
+
     return words
 
 
