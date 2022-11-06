@@ -8,6 +8,13 @@ from word_freq import sort_by_freq
 def get_args() -> Namespace:
     parser = ArgumentParser()
     parser.add_argument(
+        "problem",
+        nargs="?",
+        default=None,
+        metavar="<problem>",
+        help="problem string manual input"
+    )
+    parser.add_argument(
         "-w",
         "--word-src",
         default="OS",
@@ -19,7 +26,8 @@ def get_args() -> Namespace:
 
 def main() -> None:
     args = get_args()
-    words = solve_bee(get_letters(), args.word_src)
+    letters = args.problem if args.problem else get_letters()
+    words = solve_bee(letters, args.word_src)
     words = sort_by_freq(words)
     fprint(words)
 
