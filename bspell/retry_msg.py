@@ -13,7 +13,7 @@ def retry_msg(msg: str):
             try:
                 return retry_func(*args)
             except httpx.TransportError as err:
-                raise SystemExit(f'{msg} {str(type(err))[8:-2]}: "{err}"')
+                raise type(err)(msg) from err
 
         return retry_catch_exit_func
 
