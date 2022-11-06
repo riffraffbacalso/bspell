@@ -7,7 +7,7 @@ URL = "https://www.nytimes.com/puzzles/spelling-bee"
 CLASS_NAME = "cell-letter"
 
 
-def get_letters() -> str:
+def get_problem() -> str:
     ops = webdriver.ChromeOptions()
     ops.add_argument("headless")
     driver = webdriver.Chrome(
@@ -20,4 +20,4 @@ def get_letters() -> str:
 
 
 if __name__ == "__main__":
-    print(get_letters())
+    print(get_problem())

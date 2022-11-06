@@ -1,6 +1,6 @@
 from argparse import ArgumentParser, Namespace
 from formatting import fprint
-from scrape import get_letters
+from scrape import get_problem
 from solve import solve_bee
 from word_freq import sort_by_freq
 
@@ -26,8 +26,8 @@ def get_args() -> Namespace:
 
 def main() -> None:
     args = get_args()
-    letters = args.problem if args.problem else get_letters()
-    words = solve_bee(letters, args.word_src)
+    problem = args.problem if args.problem else get_problem()
+    words = solve_bee(problem, args.word_src)
     words = sort_by_freq(words)
     fprint(words)
 
