@@ -19,8 +19,8 @@ TAR_MEMBERS = [
     "linuxwords.1/linux.words",
     "linuxwords.1/linux.words.backup.fedora.standard",
 ]
-OPTED_REGEX = r"(?<=<B>)[A-Z][a-zA-Z]{3,}(?=</B>)"
-VALID_REGEX = r"[^']{4,}\Z"
+OPTED_REG = r"(?<=<B>)[A-Z][a-zA-Z]{3,}(?=</B>)"
+VALID_REG = r"[^']{4,}\Z"
 
 
 class Words:
@@ -37,7 +37,7 @@ class Words:
                 word_gen = (
                     match.group().lower()
                     for line in line_gen
-                    if (match := re.search(OPTED_REGEX, line))
+                    if (match := re.search(OPTED_REG, line))
                 )
                 return list(dict.fromkeys(word_gen))
 
@@ -57,7 +57,6 @@ class Words:
 
         return words
 
-
     @staticmethod
     def request_chirico_words() -> list[str]:
         @retry_msg("persistent network error when retrieving chirico words")
@@ -76,14 +75,13 @@ class Words:
             word_gen = (word.decode("latin1") for word in chain(big_gen, fed_gen))
             utf_gen = (unidecode(word) for word in word_gen)
             lower_gen = (word.lower() for word in utf_gen)
-            valid_gen = (word for word in lower_gen if re.match(VALID_REGEX, word))
+            valid_gen = (word for word in lower_gen if re.match(VALID_REG, word))
             words = sorted(list(dict.fromkeys(valid_gen)))
 
         with open(f"{ALT_WORDS_PATH}/chirico.words", "w") as f:
             print(*words, file=f, sep="\n")
 
         return words
-
 
     @staticmethod
     def get_words(word_src: str) -> list[str]:
