@@ -97,7 +97,7 @@ class Words:
                 with open(f"{ALT_WORDS_PATH}/{word_src}.words") as f:
                     return f.read().strip("\n").split("\n")
         else:
-            raise ValueError(f"invalid word source: '{word_src}'")
+            raise ValueError(f'invalid word source: "{word_src}"')
 
 
 if __name__ == "__main__":
