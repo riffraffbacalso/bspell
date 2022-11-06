@@ -1,19 +1,25 @@
 from concurrent.futures import ThreadPoolExecutor
-from itertools import islice
+from io import BytesIO
+from itertools import chain
 from string import ascii_lowercase
 from typing import Iterator
+from unidecode import unidecode
 from retry_msg import retry_msg
-import gzip
 import os
 import re
+import tarfile
 import httpx
 
 OS_WORDS_PATH = "/usr/share/dict/words"
 ALT_WORDS_PATH = "bspell/words"
 OPTED_URL = "https://www.mso.anu.edu.au/~ralph/OPTED/v003/wb1913_"
 CHIRICO_URL = "https://sourceforge.net/projects/souptonuts/files/souptonuts/dictionary/linuxwords.1.tar.gz/download"
+TAR_MEMBERS = [
+    "linuxwords.1/linux.words",
+    "linuxwords.1/linux.words.backup.fedora.standard",
+]
 OPTED_REGEX = r"(?<=<B>)[A-Z][a-zA-Z]{3,}(?=</B>)"
-CHIRICO_REGEX = r"[^']{4,}\Z"
+VALID_REGEX = r"[^']{4,}\Z"
 
 
 def read_OS_words() -> list[str]:
@@ -66,26 +72,19 @@ def request_chirico_words() -> list[str]:
         return httpx.get(CHIRICO_URL, follow_redirects=True)
 
     res = request_redirect()
-    data = gzip.decompress(res.content)
-    byte_gen = (char.to_bytes(1, "big") for char in data)
+    data = BytesIO(res.read())
 
-    # TODO: isolate content as file instead of arbitrary byte stream position
-    count = 0
-    while count < 7:
-        while next(byte_gen) != b"c":
-            pass
-        if list(islice(byte_gen, 6)) == [b"h", b"i", b"r", b"i", b"c", b"o"]:
-            count += 1
-            for _ in range(6):
-                next(byte_gen)
-    while next(byte_gen) == b"\x00":
-        pass
-    next(byte_gen)
-
-    words = "".join(
-        str(byte).lower()[2:-1] for byte in byte_gen if byte != b"\x00"
-    ).split(r"\n")
-    words = [word for word in dict.fromkeys(words) if re.match(CHIRICO_REGEX, word)]
+    with tarfile.open(fileobj=data) as tf:
+        big_reader = tf.extractfile(TAR_MEMBERS[0])
+        fed_reader = tf.extractfile(TAR_MEMBERS[1])
+        assert big_reader and fed_reader
+        big_gen = (word for word in big_reader.read().split(b"\n"))
+        fed_gen = (word for word in fed_reader.read().split(b"\n"))
+        word_gen = (word.decode("latin1") for word in chain(big_gen, fed_gen))
+        utf_gen = (unidecode(word) for word in word_gen)
+        lower_gen = (word.lower() for word in utf_gen)
+        valid_gen = (word for word in lower_gen if re.match(VALID_REGEX, word))
+        words = sorted(list(dict.fromkeys(valid_gen)))
 
     with open(f"{ALT_WORDS_PATH}/chirico.words", "w") as f:
         print(*words, file=f, sep="\n")
