@@ -1,11 +1,11 @@
 import re
-from words import get_words
+from words import Words
 
 
 def solve_bee(letters: str, word_src: str) -> list[str]:
     return [
         word
-        for word in get_words(word_src)
+        for word in Words.get_words(word_src)
         if re.match(rf"[{letters}]{{4,}}\Z", word) and letters[0] in word
     ]
 
