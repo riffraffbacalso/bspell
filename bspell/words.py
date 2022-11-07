@@ -25,11 +25,6 @@ VALID_REG = r"[^']{4,}\Z"
 
 class Words:
     @staticmethod
-    def read_OS_words() -> list[str]:
-        with open(OS_WORDS_PATH) as f:
-            return [word.lower() for word in f.read().split("\n") if len(word) >= 4]
-
-    @staticmethod
     def request_OPTED_words() -> list[str]:
         with httpx.Client(http2=True) as client:
 
@@ -86,7 +81,8 @@ class Words:
     @staticmethod
     def get_words(word_src: str) -> list[str]:
         if word_src == "OS":
-            return Words.read_OS_words()
+            with open(OS_WORDS_PATH) as f:
+                return [word.lower() for word in f.read().split("\n") if len(word) >= 4]
         elif word_src in ALT_WORD_SRCS:
             if not os.path.exists(ALT_WORDS_PATH):
                 os.mkdir(ALT_WORDS_PATH)
