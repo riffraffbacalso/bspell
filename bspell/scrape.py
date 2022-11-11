@@ -1,3 +1,4 @@
+import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -8,6 +9,7 @@ CLASS_NAME = "cell-letter"
 
 
 def get_problem() -> str:
+    os.environ["WDM_PROGRESS_BAR"] = "0"
     ops = webdriver.ChromeOptions()
     ops.add_argument("headless")
     driver = webdriver.Chrome(
