@@ -35,7 +35,7 @@ poetry shell
 bspell
 ```
 
-Answers are given in reverse word frequency order, meaning the more common a word's usage the earlier it will show, and pangrams will be highlighted in <span style="color:#98C379">**green**</span>
+Answers are given in reverse word frequency order, meaning the more common a word's usage the earlier it will show, and pangrams are highlighted in green
 
 ### Custom Puzzles
 
