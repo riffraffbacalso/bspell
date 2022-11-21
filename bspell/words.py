@@ -5,6 +5,7 @@ from string import ascii_lowercase
 from typing import Iterator
 from unidecode import unidecode
 from retry_msg import retry_msg
+import fileinput
 import os
 import re
 import tarfile
@@ -79,10 +80,13 @@ class Words:
         return words
 
     @staticmethod
-    def get_words(word_src: str) -> list[str]:
+    def get_words(word_src: str) -> Iterator[str]:
         if word_src == "OS":
-            with open(OS_WORDS_PATH) as f:
-                return [word.lower() for word in f.read().split("\n") if len(word) >= 4]
+            return (
+                word.strip().lower()
+                for word in fileinput.input(OS_WORDS_PATH)
+                if len(word) >= 4
+            )
         elif word_src in ALT_WORD_SRCS:
             if not os.path.exists(ALT_WORDS_PATH):
                 os.mkdir(ALT_WORDS_PATH)
@@ -90,11 +94,13 @@ class Words:
                 print(f"  retrieving {word_src} words...")
                 return getattr(Words, f"request_{word_src}_words")()
             else:
-                with open(f"{ALT_WORDS_PATH}/{word_src}.words") as f:
-                    return f.read().strip("\n").split("\n")
+                return (
+                    word.strip()
+                    for word in fileinput.input(f"{ALT_WORDS_PATH}/{word_src}.words")
+                )
         else:
             raise ValueError(f'invalid word source: "{word_src}"')
 
 
 if __name__ == "__main__":
-    print(Words.get_words("OPTED"))
+    print(*Words.get_words("OS"), sep=" ")
