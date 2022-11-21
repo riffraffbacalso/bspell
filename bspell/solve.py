@@ -1,7 +1,7 @@
 import re
 from words import Words
 
-PROBLEM_REG = r"[a-z]{7}\Z"
+PROBLEM_REG = r"^(?!.*(.).*\1)[a-z]{7}\Z"
 
 
 def solve_bee(problem: str, word_src: str) -> list[str]:
