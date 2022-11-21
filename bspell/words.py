@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-from io import BytesIO
+from io import BytesIO, TextIOWrapper
 from itertools import chain
 from string import ascii_lowercase
 from typing import Iterator
@@ -26,35 +26,27 @@ VALID_REG = r"[^']{4,}\Z"
 
 class Words:
     @staticmethod
-    def request_OPTED_words() -> list[str]:
+    def request_OPTED_words() -> Iterator[str]:
         with httpx.Client(http2=True) as client:
 
-            def extract_list(line_gen: Iterator[str]) -> list[str]:
-                word_gen = (
-                    match.group().lower()
-                    for line in line_gen
-                    if (match := re.search(OPTED_REG, line))
-                )
-                return list(dict.fromkeys(word_gen))
-
             @retry_msg("persistent network error when retrieving OPTED words")
-            def request_for_letter(letter: str) -> list[str]:
+            def request_for_letter(letter: str) -> Iterator[str]:
                 with client.stream("GET", f"{OPTED_URL}{letter}.html") as res:
                     line_gen = res.iter_lines()
                     while next(line_gen) != "<BODY>\n":
                         pass
-                    return extract_list(line_gen)
+                    word_gen = (
+                        match.group().lower()
+                        for line in line_gen
+                        if (match := re.search(OPTED_REG, line))
+                    )
+                    return (word for word in dict.fromkeys(word_gen))
 
             with ThreadPoolExecutor(max_workers=26) as pool:
-                words = sum(pool.map(request_for_letter, ascii_lowercase), [])
-
-        with open(f"{ALT_WORDS_PATH}/OPTED.words", "w") as f:
-            print(*words, file=f, sep="\n")
-
-        return words
+                return chain(*pool.map(request_for_letter, ascii_lowercase))
 
     @staticmethod
-    def request_chirico_words() -> list[str]:
+    def request_chirico_words() -> Iterator[str]:
         @retry_msg("persistent network error when retrieving chirico words")
         def request_redirect() -> httpx.Response:
             return httpx.get(CHIRICO_URL, follow_redirects=True)
@@ -70,14 +62,9 @@ class Words:
             fed_gen = (word for word in fed_reader.read().split(b"\n"))
             word_gen = (word.decode("latin1") for word in chain(big_gen, fed_gen))
             utf_gen = (unidecode(word) for word in word_gen)
-            lower_gen = (word.lower() for word in utf_gen)
-            valid_gen = (word for word in lower_gen if re.match(VALID_REG, word))
-            words = sorted(list(dict.fromkeys(valid_gen)))
-
-        with open(f"{ALT_WORDS_PATH}/chirico.words", "w") as f:
-            print(*words, file=f, sep="\n")
-
-        return words
+            unique_gen = (word for word in dict.fromkeys(utf_gen))
+            lower_gen = (word.lower() for word in unique_gen)
+            return (word for word in lower_gen if re.match(VALID_REG, word))
 
     @staticmethod
     def get_words(word_src: str) -> Iterator[str]:
@@ -87,17 +74,38 @@ class Words:
                 for word in fileinput.input(OS_WORDS_PATH)
                 if len(word) >= 4
             )
+
         elif word_src in ALT_WORD_SRCS:
             if not os.path.exists(ALT_WORDS_PATH):
                 os.mkdir(ALT_WORDS_PATH)
+
             if f"{word_src}.words" not in os.listdir(ALT_WORDS_PATH):
+
+                f = open(f"{ALT_WORDS_PATH}/{word_src}.words", "w")
+
                 print(f"  retrieving {word_src} words...")
-                return getattr(Words, f"request_{word_src}_words")()
+                word_gen = getattr(Words, f"request_{word_src}_words")()
+
+                def print_ret(word: str, file: TextIOWrapper) -> str:
+                    print(word, file=file)
+                    return word
+
+                def print_gen() -> Iterator[str]:
+                    while True:
+                        try:
+                            yield print_ret(next(word_gen), f)
+                        except StopIteration:
+                            f.close()
+                            break
+
+                return print_gen()
+
             else:
                 return (
                     word.strip()
                     for word in fileinput.input(f"{ALT_WORDS_PATH}/{word_src}.words")
                 )
+
         else:
             raise ValueError(f'invalid word source: "{word_src}"')
 
