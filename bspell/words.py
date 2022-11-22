@@ -67,6 +67,17 @@ class Words:
             return (word for word in lower_gen if re.match(VALID_REG, word))
 
     @staticmethod
+    def print_gen(gen: Iterator[str], file: TextIO) -> Iterator[str]:
+        while True:
+            try:
+                word = next(gen)
+                print(word, file=file)
+                yield word
+            except StopIteration:
+                file.close()
+                break
+
+    @staticmethod
     def get_words(word_src: str) -> Iterator[str]:
         if word_src == "OS":
             return (
@@ -78,28 +89,11 @@ class Words:
         elif word_src in ALT_WORD_SRCS:
             if not os.path.exists(ALT_WORDS_PATH):
                 os.mkdir(ALT_WORDS_PATH)
-
             if f"{word_src}.words" not in os.listdir(ALT_WORDS_PATH):
-
                 f = open(f"{ALT_WORDS_PATH}/{word_src}.words", "w")
-
                 print(f"  retrieving {word_src} words...")
                 word_gen = getattr(Words, f"request_{word_src}_words")()
-
-                def print_ret(word: str, file: TextIOWrapper) -> str:
-                    print(word, file=file)
-                    return word
-
-                def print_gen() -> Iterator[str]:
-                    while True:
-                        try:
-                            yield print_ret(next(word_gen), f)
-                        except StopIteration:
-                            f.close()
-                            break
-
-                return print_gen()
-
+                return Words.print_gen(word_gen, f)
             else:
                 return (
                     word.strip()
