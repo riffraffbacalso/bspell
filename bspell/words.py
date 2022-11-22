@@ -1,14 +1,16 @@
 from concurrent.futures import ThreadPoolExecutor
-from io import BytesIO, TextIOWrapper
+from io import BytesIO
 from itertools import chain
 from string import ascii_lowercase
-from typing import Iterator
-from unidecode import unidecode
-from retry_msg import retry_msg
+from typing import Iterator, TextIO
 import fileinput
 import os
 import re
 import tarfile
+
+from retry_msg import retry_msg
+
+from unidecode import unidecode
 import httpx
 
 OS_WORDS_PATH = "/usr/share/dict/words"

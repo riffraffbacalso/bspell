@@ -1,5 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
+
 from retry_msg import retry_msg
+
 import httpx
 
 URL = "https://api.datamuse.com/words"

@@ -1,4 +1,5 @@
 import re
+
 from words import Words
 
 PROBLEM_REG = r"^(?!.*(.).*\1)[a-z]{7}\Z"

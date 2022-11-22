@@ -1,4 +1,5 @@
 from argparse import ArgumentParser, Namespace
+
 from formatting import fprint
 from scrape import get_problem
 from solve import solve_bee
