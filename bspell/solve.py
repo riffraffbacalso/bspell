@@ -7,7 +7,9 @@ PROBLEM_REG = r"^(?!.*(.).*\1)[a-z]{7}\Z"
 
 def solve_bee(problem: str, word_src: str) -> list[str]:
     if not re.match(PROBLEM_REG, problem):
-        raise ValueError(f'puzzle must be seven alphabet characters, not "{problem}"')
+        raise ValueError(
+            f'puzzle must be seven unique alphabet characters, not "{problem}"'
+        )
     return [
         word
         for word in Words.get_words(word_src)
