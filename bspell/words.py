@@ -64,9 +64,9 @@ class Words:
             fed_gen = (word for word in fed_reader.read().split(b"\n"))
             word_gen = (word.decode("latin1") for word in chain(big_gen, fed_gen))
             utf_gen = (unidecode(word) for word in word_gen)
-            unique_gen = (word for word in dict.fromkeys(utf_gen))
-            lower_gen = (word.lower() for word in unique_gen)
-            return (word for word in lower_gen if re.match(VALID_REG, word))
+            lower_gen = (word.lower() for word in utf_gen)
+            valid_gen = (word for word in lower_gen if re.match(VALID_REG, word))
+            return (word for word in dict.fromkeys(valid_gen))
 
     @staticmethod
     def print_gen(gen: Iterator[str], file: TextIO) -> Iterator[str]:
