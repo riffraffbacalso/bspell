@@ -15,7 +15,6 @@ import httpx
 
 OS_WORDS_PATH = "/usr/share/dict/words"
 ALT_WORDS_PATH = "bspell/words"
-ALT_WORD_SRCS = ["OPTED", "chirico"]
 OPTED_URL = "https://www.mso.anu.edu.au/~ralph/OPTED/v003/wb1913_"
 CHIRICO_URL = "https://sourceforge.net/projects/souptonuts/files/souptonuts/dictionary/linuxwords.1.tar.gz/download"
 TAR_MEMBERS = [
@@ -88,7 +87,7 @@ class Words:
                 if len(word) >= 4
             )
 
-        elif word_src in ALT_WORD_SRCS:
+        else:
             if not os.path.exists(ALT_WORDS_PATH):
                 os.mkdir(ALT_WORDS_PATH)
             if f"{word_src}.words" not in os.listdir(ALT_WORDS_PATH):
@@ -101,9 +100,6 @@ class Words:
                     word.strip()
                     for word in fileinput.input(f"{ALT_WORDS_PATH}/{word_src}.words")
                 )
-
-        else:
-            raise ValueError(f'invalid word source: "{word_src}"')
 
 
 if __name__ == "__main__":

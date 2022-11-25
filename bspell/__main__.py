@@ -18,6 +18,7 @@ def get_args() -> Namespace:
     parser.add_argument(
         "-w",
         "--word-src",
+        choices=["OPTED", "chirico"],
         default="OS",
         metavar="<word source>",
         help="the source of words used for puzzle solutions",
