@@ -1,29 +1,8 @@
-from argparse import ArgumentParser, Namespace
-
+from args import get_args
 from formatting import fprint
 from scrape import get_problem
 from solve import solve_bee
 from word_freq import sort_by_freq
-
-
-def get_args() -> Namespace:
-    parser = ArgumentParser()
-    parser.add_argument(
-        "problem",
-        nargs="?",
-        default=None,
-        metavar="<problem>",
-        help="problem string manual input"
-    )
-    parser.add_argument(
-        "-w",
-        "--word-src",
-        choices=["OPTED", "chirico"],
-        default="OS",
-        metavar="<word source>",
-        help="the source of words used for puzzle solutions",
-    )
-    return parser.parse_args()
 
 
 def main() -> None:
