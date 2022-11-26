@@ -9,11 +9,11 @@ class ValidateAction(Action):
         self,
         parser: ArgumentParser,
         namespace: Namespace,
-        value: str,
+        value: str | None,
         option_string: str | None = None,
     ) -> None:
         del parser, option_string
-        if not re.match(PROBLEM_REG, value):
+        if value and not re.match(PROBLEM_REG, value):
             raise ArgumentError(
                 None,
                 f"argument <problem>: invalid puzzle: '{value}' (must be seven unique alphabet characters)",
