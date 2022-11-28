@@ -82,9 +82,9 @@ class Words:
     def get_words(word_src: str) -> Iterator[str]:
         if word_src == "OS":
             return (
-                word.strip().lower()
-                for word in fileinput.input(OS_WORDS_PATH)
-                if len(word) >= 4
+                word.lower()
+                for line in fileinput.input(OS_WORDS_PATH)
+                if len(word := line.strip()) >= 4
             )
 
         else:
