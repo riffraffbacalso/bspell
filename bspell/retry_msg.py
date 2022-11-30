@@ -1,3 +1,4 @@
+from functools import wraps
 from typing import Any, Callable
 
 from retry import retry
@@ -10,6 +11,7 @@ def retry_msg(msg: str) -> Callable:
         def retry_func(*args: tuple[Any, ...]):
             return func(*args)
 
+        @wraps(retry_func)
         def retry_catch_exit_func(*args: tuple[Any, ...]) -> Callable:
             try:
                 return retry_func(*args)
