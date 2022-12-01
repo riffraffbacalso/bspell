@@ -72,7 +72,7 @@ class Words:
         while True:
             try:
                 word = next(gen)
-                print(word, file=file)
+                file.write(f"{word}\n")
                 yield word
             except StopIteration:
                 file.close()
