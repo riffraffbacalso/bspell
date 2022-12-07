@@ -6,20 +6,16 @@ RST_SEQ = "\033[0m"
 
 
 def render_lines(lines: list[str], answers: list[str]) -> list[str]:
-    def is_answer(word: str) -> bool:
-        return word in answers
-
-    def is_pangram(word: str) -> bool:
-        return len(set(word)) == 7
-
     def esc_seq(word: str) -> str:
-        seq = "\033[1;" if is_pangram(word) or is_answer(word) else ""
-        seq += ANS_SEQ if is_answer(word) else ""
-        seq += ";" if is_pangram(word) and is_answer(word) else ""
-        seq += PAN_SEQ if is_pangram(word) else ""
-        seq += "m" if is_pangram(word) or is_answer(word) else ""
+        is_answer = word in answers
+        is_pangram = len(set(word)) == 7
+        seq = "\033[1;" if is_pangram or is_answer else ""
+        seq += ANS_SEQ if is_answer else ""
+        seq += ";" if is_pangram and is_answer else ""
+        seq += PAN_SEQ if is_pangram else ""
+        seq += "m" if is_pangram or is_answer else ""
         seq += word
-        seq += RST_SEQ if is_pangram(word) or is_answer(word) else ""
+        seq += RST_SEQ if is_pangram or is_answer else ""
         return seq
 
     def render(line: str) -> str:
