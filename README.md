@@ -24,7 +24,7 @@ Some answers for the above example are: "role", "bell", "people", or the pangram
 
 ## The Solver
 
-**bspell** requires [Poetry](https://python-poetry.org/) and an installation of [Google Chrome](https://www.google.co.uk/chrome/) to work
+**bspell** requires [Poetry](https://python-poetry.org/)
 
 ### Usage
 
