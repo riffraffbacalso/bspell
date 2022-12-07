@@ -20,7 +20,7 @@ The goal then is to find as many English words satisfying the following constrai
 - is not a hyphenated word, proper noun, or profanity
 - may contain the same letter more than once
 
-Some answers for the above example are: "role", "bell", "people", or the pangram—a word including every letter—"problem"
+Some valid answers for the above example are: "role", "bell", "people", or the pangram—a word including every letter—"problem". Some invalid answers are: "drool", "lob", "probe", or "rope-pull"
 
 ## The Solver
 
@@ -35,7 +35,7 @@ poetry shell
 bspell
 ```
 
-Answers are given in reverse word frequency order, meaning the more common a word's usage the earlier it will show, and pangrams are highlighted in green
+Answers are given in reverse word frequency order, meaning the more common a word's usage the earlier it will show. Pangrams are highlighted in green. Words from the day's actual NYTimes word list are underlined and italicised
 
 ### Custom Puzzles
 
