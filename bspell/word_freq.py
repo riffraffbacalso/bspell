@@ -32,8 +32,3 @@ def get_freqs(words: list[str]) -> dict[str, float]:
 def sort_by_freq(words) -> list[str]:
     freqs = get_freqs(words)
     return sorted(words, key=freqs.__getitem__, reverse=True)
-
-
-if __name__ == "__main__":
-    words = ["career", "the", "avaricious"]
-    print(sort_by_freq(words))

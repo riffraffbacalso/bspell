@@ -23,20 +23,3 @@ def highlight_lines(lines: list[str]) -> list[str]:
 def fprint(words: list[str]) -> None:
     words = highlight_lines(wrap(words))
     print(*(f"  {line}" for line in words), sep="\n")
-
-
-if __name__ == "__main__":
-    fprint(
-        [
-            "qwertyu",
-            "qwerty",
-            "qqwerty",
-            "uytrewq",
-            "qqwweerrttyyuu",
-            "qwertyuuuuuu",
-            "qwe",
-            "qq",
-            "reqwterwr",
-            "yteru",
-        ]
-    )

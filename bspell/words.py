@@ -86,7 +86,6 @@ class Words:
                 for line in fileinput.input(OS_WORDS_PATH)
                 if len(word := line.strip()) >= 4
             )
-
         else:
             if not os.path.exists(ALT_WORDS_PATH):
                 os.mkdir(ALT_WORDS_PATH)
@@ -100,7 +99,3 @@ class Words:
                     word.strip()
                     for word in fileinput.input(f"{ALT_WORDS_PATH}/{word_src}.words")
                 )
-
-
-if __name__ == "__main__":
-    print(*Words.get_words("OS"), sep=" ")
