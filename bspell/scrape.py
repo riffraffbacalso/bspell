@@ -8,7 +8,7 @@ from retry_msg import retry_msg
 URL = "https://www.nytimes.com/puzzles/spelling-bee"
 
 
-def get_problem() -> str:
+def get_problem() -> tuple[str, list[str]]:
     @retry_msg("persistent network error when requesting today's puzzle")
     def request_page() -> httpx.Response:
         return httpx.get(URL, follow_redirects=True)
@@ -18,4 +18,6 @@ def get_problem() -> str:
     js = soup.find_all("script")[2].string
     obj_str = js[18:]
     obj = json.loads(obj_str)
-    return "".join(obj["today"]["validLetters"])
+    problem = "".join(obj["today"]["validLetters"])
+    answers = obj["today"]["answers"]
+    return problem, answers
