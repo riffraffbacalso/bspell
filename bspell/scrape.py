@@ -1,26 +1,15 @@
-import os
+import json
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
+from bs4 import BeautifulSoup as BS
+import httpx
 
 URL = "https://www.nytimes.com/puzzles/spelling-bee"
-CLASS_NAME = "cell-letter"
 
 
 def get_problem() -> str:
-    os.environ["WDM_PROGRESS_BAR"] = "0"
-    ops = webdriver.ChromeOptions()
-    ops.add_argument("headless")
-    driver = webdriver.Chrome(
-        service=Service(ChromeDriverManager().install()), options=ops
-    )
-    driver.get(URL)
-    els = driver.find_elements(By.CLASS_NAME, CLASS_NAME)
-    letter_list = [str(el.get_property("textContent")) for el in els]
-    return "".join(letter_list)
-
-
-if __name__ == "__main__":
-    print(get_problem())
+    res = httpx.get(URL, follow_redirects=True)
+    soup = BS(res.text, "html.parser")
+    js = soup.find_all("script")[2].string
+    obj_str = js[18:]
+    obj = json.loads(obj_str)
+    return "".join(obj["today"]["validLetters"])
