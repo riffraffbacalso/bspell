@@ -24,7 +24,7 @@ Some valid answers for the above example are: "role", "bell", "people", or the p
 
 ## The Solver
 
-**bspell** requires [Poetry](https://python-poetry.org/)
+**bspell** requires [Poetry](https://python-poetry.org/) to work
 
 ### Usage
 
@@ -47,7 +47,7 @@ bspell <puzzle string>
 
 ### Alternative Word Sources
 
-By default, **bspell** uses the dictionary pre-installed on Mac and Linux machines in `usr/share/dict/words`. In some cases, this may be insufficient, in which case you can specify a different word source with the `-w` or `--word-source` argument. Currently the options are "OPTED", or the [Online Plain Text English Dictionary](https://www.mso.anu.edu.au/~ralph/OPTED/), and "chirico", a comprehensive word list compiled by [Mike Chirico](https://sourceforge.net/projects/souptonuts/files/souptonuts/dictionary/linuxwords.1.tar.gz/download). **bspell** will download the word list in the project directory, if not already there, and find solutions from it
+By default, **bspell** uses the dictionary pre-installed on Mac and Linux machines in `usr/share/dict/words`. This could be insufficient for some puzzles, in which case you can specify an alternative word source with the `-w` or `--word-source` argument. Currently the options are "OPTED", or the [Online Plain Text English Dictionary](https://www.mso.anu.edu.au/~ralph/OPTED/), and "chirico", a comprehensive word list compiled by [Mike Chirico](https://sourceforge.net/projects/souptonuts/files/souptonuts/dictionary/linuxwords.1.tar.gz/download). **bspell** will download the word list in the project directory, if not already there, and derive solutions from that instead
 
 ```
 bspell -w <word source>
