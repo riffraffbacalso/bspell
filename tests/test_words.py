@@ -71,7 +71,7 @@ def test_OPTED_requests(httpx_mock: HTTPXMock):
 
 @pytest.mark.parametrize("word,fn,defn", OPTED_PARAMS.values(), ids=OPTED_PARAMS.keys())
 def test_OPTED_parse(httpx_mock: HTTPXMock, word: str, fn: str, defn: str):
-    url_pattern = re.compile(rf"{OPTED_URL}[a-z].html")
+    url_pattern = re.compile(rf"{re.escape(OPTED_URL)}[a-z].html")
     httpx_mock.add_response(
         url=url_pattern,
         stream=IteratorStream(

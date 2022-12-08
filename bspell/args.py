@@ -1,7 +1,7 @@
 from argparse import Action, ArgumentError, ArgumentParser, Namespace
 import re
 
-PROBLEM_REG = r"^(?!.*(.).*\1)[a-z]{7}\Z"
+PROBLEM_REG = re.compile(r"^(?!.*(.).*\1)[a-z]{7}\Z")
 
 
 class ValidateAction(Action):
@@ -13,7 +13,7 @@ class ValidateAction(Action):
         option_string: str | None = None,
     ) -> None:
         del parser, option_string
-        if value and not re.match(PROBLEM_REG, value):
+        if value and not PROBLEM_REG.match(value):
             raise ArgumentError(
                 None,
                 f"argument <problem>: invalid puzzle: '{value}' (must be seven unique alphabet characters)",

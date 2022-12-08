@@ -21,8 +21,8 @@ TAR_MEMBERS = [
     "linuxwords.1/linux.words",
     "linuxwords.1/linux.words.backup.fedora.standard",
 ]
-OPTED_REG = r"(?<=<B>)[A-Z][a-zA-Z]{3,}(?=</B>)"
-VALID_REG = r"[^']{4,}\Z"
+OPTED_REG = re.compile(r"(?<=<B>)[A-Z][a-zA-Z]{3,}(?=</B>)")
+VALID_REG = re.compile(r"[^']{4,}\Z")
 
 
 class Words:
@@ -39,7 +39,7 @@ class Words:
                     word_gen = (
                         match.group().lower()
                         for line in line_gen
-                        if (match := re.search(OPTED_REG, line))
+                        if (match := OPTED_REG.search(line))
                     )
                     return (word for word in dict.fromkeys(word_gen))
 
@@ -64,7 +64,7 @@ class Words:
             word_gen = (word.decode("latin1") for word in chain(big_gen, fed_gen))
             utf_gen = (unidecode(word) for word in word_gen)
             lower_gen = (word.lower() for word in utf_gen)
-            valid_gen = (word for word in lower_gen if re.match(VALID_REG, word))
+            valid_gen = (word for word in lower_gen if VALID_REG.match(word))
             return (word for word in dict.fromkeys(valid_gen))
 
     @staticmethod

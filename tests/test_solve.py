@@ -7,7 +7,7 @@ from tests.params_solve import *
 @pytest.mark.parametrize("word_src", WS_PARAMS.values(), ids=WS_PARAMS.keys())
 def test_use_word_src(mocker: MockerFixture, word_src: str):
     mock_get_words = mocker.patch("words.Words.get_words")
-    solve_bee("", word_src)
+    solve_bee("problem", word_src)
     mock_get_words.assert_called_once_with(word_src)
 
 
