@@ -81,11 +81,12 @@ class Words:
     @staticmethod
     def get_words(word_src: str) -> Iterator[str]:
         if word_src == "OS":
-            return (
+            lower_gen = (
                 word.lower()
-                for line in fileinput.input(OS_WORDS_PATH)
+                for line in open(OS_WORDS_PATH)
                 if len(word := line.strip()) >= 4
             )
+            return (word for word in dict.fromkeys(lower_gen))
         else:
             if not os.path.exists(ALT_WORDS_PATH):
                 os.mkdir(ALT_WORDS_PATH)

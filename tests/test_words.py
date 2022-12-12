@@ -18,14 +18,14 @@ from tests.params_words import *
 
 
 def test_OS_reads_share_dict(mocker: MockerFixture):
-    mock_fileinput = mocker.patch("fileinput.input")
+    mock_open = mocker.patch("builtins.open")
     Words.get_words("OS")
-    mock_fileinput.assert_called_once_with(OS_WORDS_PATH)
+    mock_open.assert_called_once_with(OS_WORDS_PATH)
 
 
 @pytest.mark.parametrize("lines,words", OS_PARAMS.values(), ids=OS_PARAMS.keys())
 def test_OS_formats_words(mocker: MockerFixture, lines: list[str], words: list[str]):
-    mocker.patch("fileinput.input", return_value=lines)
+    mocker.patch("builtins.open", return_value=lines)
     assert [word for word in Words.get_words("OS")] == words
 
 
