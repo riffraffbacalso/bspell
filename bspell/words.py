@@ -97,6 +97,6 @@ class Words:
                 return Words.print_gen(word_gen, f)
             else:
                 return (
-                    word.strip()
-                    for word in fileinput.input(f"{ALT_WORDS_PATH}/{word_src}.words")
+                    line.strip()
+                    for line in fileinput.input(f"{ALT_WORDS_PATH}/{word_src}.words")
                 )
