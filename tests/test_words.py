@@ -44,7 +44,7 @@ def test_create_alt(mocker: MockerFixture, word_src: str):
     mocker.patch("os.listdir", return_value=[])
     mock_open = mocker.patch("builtins.open")
     mock_req = mocker.patch(f"words.Words.request_{word_src}_words")
-    mocker.patch(f"words.Words.print_gen")
+    mocker.patch("words.file_gen")
     Words.get_words(word_src)
     mock_open.assert_called_once_with(f"{ALT_WORDS_PATH}/{word_src}.words", "w")
     mock_req.assert_called_once()
@@ -105,25 +105,14 @@ def test_chirico(
 
 
 @pytest.mark.parametrize("word_src", ALT_WS_PARAMS.values(), ids=ALT_WS_PARAMS.keys())
-def test_print_gen_used(mocker: MockerFixture, word_src: str):
+def test_file_gen_used(mocker: MockerFixture, word_src: str):
     mocker.patch("os.path.exists", return_value=True)
     mocker.patch("os.listdir", return_value=[])
     mock_file = mocker.patch("builtins.open").return_value
     mock_gen = mocker.patch(f"words.Words.request_{word_src}_words")
-    mock_print_gen = mocker.patch(f"words.Words.print_gen")
+    mock_file_gen = mocker.patch("words.file_gen")
     Words.get_words(word_src)
-    mock_print_gen.assert_called_once_with(mock_gen(), mock_file)
-
-
-@pytest.mark.parametrize("words", PRINT_PARAMS.values(), ids=PRINT_PARAMS.keys())
-def test_write_and_yield(mocker: MockerFixture, words: list[str]):
-    mock_file = mocker.Mock()
-    mock_file.write = mocker.Mock()
-    mock_file.close = mocker.Mock()
-    word_gen = Words.print_gen((word for word in words), mock_file)
-    assert [word for word in word_gen] == words
-    assert mock_file.write.mock_calls == [mocker.call(f"{word}\n") for word in words]
-    mock_file.close.assert_called_once()
+    mock_file_gen.assert_called_once_with(mock_gen(), mock_file)
 
 
 @pytest.mark.parametrize("word_src", ALT_WS_PARAMS.values(), ids=ALT_WS_PARAMS.keys())

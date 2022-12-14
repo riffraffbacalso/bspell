@@ -2,12 +2,13 @@ from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from itertools import chain
 from string import ascii_lowercase
-from typing import Iterator, TextIO
+from typing import Iterator
 import fileinput
 import os
 import re
 import tarfile
 
+from gen_util import file_gen
 from retry_msg import retry_msg
 
 from unidecode import unidecode
@@ -68,17 +69,6 @@ class Words:
             return (word for word in dict.fromkeys(valid_gen))
 
     @staticmethod
-    def print_gen(gen: Iterator[str], file: TextIO) -> Iterator[str]:
-        while True:
-            try:
-                word = next(gen)
-                file.write(f"{word}\n")
-                yield word
-            except StopIteration:
-                file.close()
-                break
-
-    @staticmethod
     def get_words(word_src: str) -> Iterator[str]:
         if word_src == "OS":
             lower_gen = (
@@ -94,7 +84,8 @@ class Words:
                 f = open(f"{ALT_WORDS_PATH}/{word_src}.words", "w")
                 print(f"  retrieving {word_src} words...")
                 word_gen = getattr(Words, f"request_{word_src}_words")()
-                return Words.print_gen(word_gen, f)
+                gen = file_gen(word_gen, f)
+                return gen
             else:
                 return (
                     line.strip()
