@@ -41,7 +41,7 @@ def stream_gen(
 def pool_gen(gen: Iterator[T], pool: ThreadPoolExecutor) -> Iterator[T]:
     for it in gen:
         yield it
-    pool.__exit__(None, None, None)
+    pool.shutdown()
 
 
 def client_gen(gen: Iterator[T], client: httpx.Client) -> Iterator[T]:
