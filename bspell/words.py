@@ -1,6 +1,5 @@
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, wait
 from io import BytesIO
-from itertools import chain
 from string import ascii_lowercase
 from typing import Iterator
 import fileinput
@@ -8,7 +7,7 @@ import os
 import re
 import tarfile
 
-from gen_util import file_gen
+from gen_util import chain_gen, client_gen, file_gen, pool_gen, stream_gen, unique_gen
 from retry_msg import retry_msg
 
 from unidecode import unidecode
@@ -29,23 +28,31 @@ VALID_REG = re.compile(r"[^']{4,}\Z")
 class Words:
     @staticmethod
     def request_OPTED_words() -> Iterator[str]:
-        with httpx.Client(http2=True) as client:
+        client = httpx.Client(http2=True)
 
-            @retry_msg("persistent network error when retrieving OPTED words")
-            def request_for_letter(letter: str) -> Iterator[str]:
-                with client.stream("GET", f"{OPTED_URL}{letter}.html") as res:
-                    line_gen = res.iter_lines()
-                    while next(line_gen) != "<BODY>\n":
-                        pass
-                    word_gen = (
-                        match.group().lower()
-                        for line in line_gen
-                        if (match := OPTED_REG.search(line))
-                    )
-                    return (word for word in dict.fromkeys(word_gen))
+        @retry_msg("persistent network error when retrieving OPTED words")
+        def request_for_letter(letter: str) -> Iterator[str]:
+            res_context = client.stream("GET", f"{OPTED_URL}{letter}.html")
+            res = res_context.__enter__()
+            line_gen = res.iter_lines()
+            while next(line_gen) != "<BODY>\n":
+                pass
+            word_gen = (
+                match.group().lower()
+                for line in line_gen
+                if (match := OPTED_REG.search(line))
+            )
+            u_gen = unique_gen(word_gen)
+            return stream_gen(u_gen, res_context)
 
-            with ThreadPoolExecutor(max_workers=26) as pool:
-                return chain(*pool.map(request_for_letter, ascii_lowercase))
+        pool = ThreadPoolExecutor(max_workers=26)
+        gens = list(pool.map(request_for_letter, ascii_lowercase))
+
+        ch_gen = chain_gen(gens)
+        p_gen = pool_gen(ch_gen, pool)
+        cl_gen = client_gen(p_gen, client)
+
+        return cl_gen
 
     @staticmethod
     def request_chirico_words() -> Iterator[str]:
@@ -62,7 +69,7 @@ class Words:
             assert big_reader and fed_reader
             big_gen = (word for word in big_reader.read().split(b"\n"))
             fed_gen = (word for word in fed_reader.read().split(b"\n"))
-            word_gen = (word.decode("latin1") for word in chain(big_gen, fed_gen))
+            word_gen = (word.decode("latin1") for word in chain_gen([big_gen, fed_gen]))
             utf_gen = (unidecode(word) for word in word_gen)
             lower_gen = (word.lower() for word in utf_gen)
             valid_gen = (word for word in lower_gen if VALID_REG.match(word))
@@ -73,10 +80,10 @@ class Words:
         if word_src == "OS":
             lower_gen = (
                 word.lower()
-                for line in open(OS_WORDS_PATH)
+                for line in fileinput.input(OS_WORDS_PATH)
                 if len(word := line.strip()) >= 4
             )
-            return (word for word in dict.fromkeys(lower_gen))
+            return unique_gen(lower_gen)
         else:
             if not os.path.exists(ALT_WORDS_PATH):
                 os.mkdir(ALT_WORDS_PATH)
