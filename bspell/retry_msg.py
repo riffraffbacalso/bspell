@@ -1,4 +1,5 @@
 from functools import wraps
+import sys
 from typing import Any, Callable
 
 from retry import retry
@@ -16,7 +17,7 @@ def retry_msg(msg: str) -> Callable:
             try:
                 return retry_func(*args)
             except httpx.TransportError as err:
-                raise type(err)(msg) from err
+                sys.exit(f"{type(err).__name__}: {err}\n{msg}")
 
         return retry_catch_exit_func
 
