@@ -9,11 +9,11 @@ import httpx
 def retry_msg(msg: str) -> Callable:
     def retry_http(func: Callable) -> Callable:
         @retry(httpx.TransportError, tries=5, delay=1)
-        def retry_func(*args: tuple[Any, ...]):
+        def retry_func(*args: tuple[Any, ...]) -> Any:
             return func(*args)
 
         @wraps(retry_func)
-        def retry_catch_exit_func(*args: tuple[Any, ...]) -> Callable:
+        def retry_catch_exit_func(*args: tuple[Any, ...]) -> Any:
             try:
                 return retry_func(*args)
             except httpx.TransportError as err:
