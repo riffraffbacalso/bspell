@@ -1,6 +1,5 @@
-from concurrent.futures import ThreadPoolExecutor, wait
+from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
-from string import ascii_lowercase
 from typing import Iterator
 import fileinput
 import os
@@ -33,8 +32,7 @@ class Words:
         @retry_msg("persistent network error when retrieving OPTED words")
         def request_for_letter(letter: str) -> Iterator[str]:
             res_context = client.stream("GET", f"{OPTED_URL}{letter}.html")
-            res = res_context.__enter__()
-            line_gen = res.iter_lines()
+            line_gen = stream_gen(res_context)
             while next(line_gen) != "<BODY>\n":
                 pass
             word_gen = (
@@ -42,17 +40,11 @@ class Words:
                 for line in line_gen
                 if (match := OPTED_REG.search(line))
             )
-            u_gen = unique_gen(word_gen)
-            return stream_gen(u_gen, res_context)
+            return unique_gen(word_gen)
 
         pool = ThreadPoolExecutor(max_workers=26)
-        gens = list(pool.map(request_for_letter, ascii_lowercase))
-
-        ch_gen = chain_gen(gens)
-        p_gen = pool_gen(ch_gen, pool)
-        cl_gen = client_gen(p_gen, client)
-
-        return cl_gen
+        p_gen = pool_gen(pool, request_for_letter)
+        return client_gen(p_gen, client)
 
     @staticmethod
     def request_chirico_words() -> Iterator[str]:
@@ -72,8 +64,8 @@ class Words:
             word_gen = (word.decode("latin1") for word in chain_gen([big_gen, fed_gen]))
             utf_gen = (unidecode(word) for word in word_gen)
             lower_gen = (word.lower() for word in utf_gen)
-            valid_gen = (word for word in lower_gen if VALID_REG.match(word))
-            return (word for word in dict.fromkeys(valid_gen))
+            u_gen = unique_gen(lower_gen)
+            return (word for word in u_gen if VALID_REG.match(word))
 
     @staticmethod
     def get_words(word_src: str) -> Iterator[str]:
@@ -90,7 +82,7 @@ class Words:
             if f"{word_src}.words" not in os.listdir(ALT_WORDS_PATH):
                 f = open(f"{ALT_WORDS_PATH}/{word_src}.words", "w")
                 print(f"  retrieving {word_src} words...")
-                word_gen = getattr(Words, f"request_{word_src}_words")()
+                word_gen = getattr(Words, f"request_{word_src}_words")
                 gen = file_gen(word_gen, f)
                 return gen
             else:
