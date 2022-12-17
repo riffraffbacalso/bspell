@@ -6,7 +6,7 @@ import os
 import re
 import tarfile
 
-from gen_util import chain_gen, client_gen, file_gen, pool_gen, stream_gen, unique_gen
+from gen_util import chain_iter, client_iter, file_iter, pool_iter, stream_iter, unique_iter
 from retry_msg import retry_msg
 
 from unidecode import unidecode
@@ -32,7 +32,7 @@ class Words:
         @retry_msg("persistent network error when retrieving OPTED words")
         def request_for_letter(letter: str) -> Iterator[str]:
             res_context = client.stream("GET", f"{OPTED_URL}{letter}.html")
-            line_gen = stream_gen(res_context)
+            line_gen = stream_iter(res_context)
             while next(line_gen) != "<BODY>\n":
                 pass
             word_gen = (
@@ -40,11 +40,11 @@ class Words:
                 for line in line_gen
                 if (match := OPTED_REG.search(line))
             )
-            return unique_gen(word_gen)
+            return unique_iter(word_gen)
 
         pool = ThreadPoolExecutor(max_workers=26)
-        p_gen = pool_gen(pool, request_for_letter)
-        return client_gen(p_gen, client)
+        pool_gen = pool_iter(pool, request_for_letter)
+        return client_iter(pool_gen, client)
 
     @staticmethod
     def request_chirico_words() -> Iterator[str]:
@@ -61,11 +61,11 @@ class Words:
             assert big_reader and fed_reader
             big_gen = (word for word in big_reader.read().split(b"\n"))
             fed_gen = (word for word in fed_reader.read().split(b"\n"))
-            word_gen = (word.decode("latin1") for word in chain_gen([big_gen, fed_gen]))
+            word_gen = (word.decode("latin1") for word in chain_iter([big_gen, fed_gen]))
             utf_gen = (unidecode(word) for word in word_gen)
             lower_gen = (word.lower() for word in utf_gen)
-            u_gen = unique_gen(lower_gen)
-            return (word for word in u_gen if VALID_REG.match(word))
+            unique_gen = unique_iter(lower_gen)
+            return (word for word in unique_gen if VALID_REG.match(word))
 
     @staticmethod
     def get_words(word_src: str) -> Iterator[str]:
@@ -75,7 +75,7 @@ class Words:
                 for line in fileinput.input(OS_WORDS_PATH)
                 if len(word := line.strip()) >= 4
             )
-            return unique_gen(lower_gen)
+            return unique_iter(lower_gen)
         else:
             if not os.path.exists(ALT_WORDS_PATH):
                 os.mkdir(ALT_WORDS_PATH)
@@ -83,7 +83,7 @@ class Words:
                 f = open(f"{ALT_WORDS_PATH}/{word_src}.words", "w")
                 print(f"  retrieving {word_src} words...")
                 word_gen = getattr(Words, f"request_{word_src}_words")
-                gen = file_gen(word_gen, f)
+                gen = file_iter(word_gen, f)
                 return gen
             else:
                 return (

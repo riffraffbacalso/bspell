@@ -44,7 +44,7 @@ def test_create_alt(mocker: MockerFixture, word_src: str):
     mocker.patch("os.listdir", return_value=[])
     mock_open = mocker.patch("builtins.open")
     mocker.patch(f"words.Words.request_{word_src}_words")
-    mocker.patch("words.file_gen")
+    mocker.patch("words.file_iter")
     Words.get_words(word_src)
     mock_open.assert_called_once_with(f"{ALT_WORDS_PATH}/{word_src}.words", "w")
 
@@ -104,14 +104,14 @@ def test_chirico(
 
 
 @pytest.mark.parametrize("word_src", ALT_WS_PARAMS.values(), ids=ALT_WS_PARAMS.keys())
-def test_file_gen_used(mocker: MockerFixture, word_src: str):
+def test_file_iter_used(mocker: MockerFixture, word_src: str):
     mocker.patch("os.path.exists", return_value=True)
     mocker.patch("os.listdir", return_value=[])
     mock_file = mocker.patch("builtins.open").return_value
     mock_req = mocker.patch(f"words.Words.request_{word_src}_words")
-    mock_file_gen = mocker.patch("words.file_gen")
+    mock_file_iter = mocker.patch("words.file_iter")
     Words.get_words(word_src)
-    mock_file_gen.assert_called_once_with(mock_req, mock_file)
+    mock_file_iter.assert_called_once_with(mock_req, mock_file)
 
 
 @pytest.mark.parametrize("word_src", ALT_WS_PARAMS.values(), ids=ALT_WS_PARAMS.keys())
