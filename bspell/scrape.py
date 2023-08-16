@@ -15,7 +15,7 @@ def get_problem() -> tuple[str, list[str]]:
 
     res = request_page()
     soup = BS(res.text, "html.parser")
-    js = soup.find_all("script")[2].string
+    js = soup.find_all("script")[3].string
     obj_str = js[18:]
     obj = json.loads(obj_str)
     problem = "".join(obj["today"]["validLetters"])
